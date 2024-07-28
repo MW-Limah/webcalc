@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+            font-family: 'Arial', sans-serif;
+            flex-direction: column;
+        }
+
+        .calculator {
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0px 0px 10px 0px #aaa;
+            width: 400px;
+            margin-bottom: 20px;
+        }
+
+        .calculator-screen {
+            width: 100%;
+            height: 80px;
+            border: none;
+            background-color: #252525;
+            color: #fff;
+            text-align: right;
+            padding: 0 20px;
+            font-size: 2.5rem;
+            border-top-left-radius: 5px;
+            border-top-right-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        .calculator-keys {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            padding: 20px;
+        }
+
+        button {
+            height: 60px;
+            border: none;
+            border-radius: 5px;
+            background-color: #e0e0e0;
+            font-size: 1.5rem;
+            transition: background-color 0.3s ease;
+        }
+
+        button:active {
+            background-color: #ccc;
+        }
+
+        .operator {
+            background-color: #ff9500;
+            color: white;
+        }
+
+        .operator:active {
+            background-color: #e08500;
+        }
+
+        .equal-sign {
+            background-color: #4caf50;
+            color: white;
+            grid-column: span 2;
+        }
+
+        .equal-sign:active {
+            background-color: #45a045;
+        }
+
+        .all-clear {
+            background-color: #d4d4d2;
+        }
+
+        .all-clear:active {
+            background-color: #bcbcbc;
+        }
+
+        .decimal {
+            background-color: #d4d4d2;
+        }
+
+        .decimal:active {
+            background-color: #bcbcbc;
+        }
+
+        .history {
+            width: 400px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0px 0px 10px 0px #aaa;
+            padding: 20px;
+            background-color: #fff;
+            box-sizing: border-box;
+        }
+
+        .history ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .history li {
+            padding: 5px 0;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .clear-history {
+            background-color: #ff3b30;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .clear-history:active {
+            background-color: #e02a22;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <input type="text" class="calculator-screen" value="" disabled />
+        <div class="calculator-keys">
+            <button>%</button>
+            <button>('±')</button>
+            <button type="button" class="all-clear" value="all-clear">AC</button>
+            <button type="button" class="operator" value="/">&divide;</button>
+            <button type="button" value="7">7</button>
+            <button type="button" value="8">8</button>
+            <button type="button" value="9">9</button>
+            <button type="button" class="operator" value="*">&times;</button>
+            <button type="button" value="4">4</button>
+            <button type="button" value="5">5</button>
+            <button type="button" value="6">6</button>
+            <button type="button" class="operator" value="-">-</button>
+            <button type="button" value="1">1</button>
+            <button type="button" value="2">2</button>
+            <button type="button" value="3">3</button>
+            <button type="button" class="operator" value="+">+</button>
+            <button type="button" value="0" style="grid-column: span 2;">0</button>
+            <button type="button" class="decimal" value=".">.</button>
+            <button type="button" class="equal-sign operator" value="=">=</button>
+        </div>
+    </div>
+    <div class="history">
+        <h3>Histórico</h3>
+        <ul id="history-list"></ul>
+        <button class="clear-history">Limpar Histórico</button>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const calculator = {
+                displayValue: '0',
+                firstOperand: null,
+                waitingForSecondOperand: false,
+                operator: null,
+                history: []
+            };
+
+            function updateDisplay() {
+                const display = document.querySelector('.calculator-screen');
+                display.value = calculator.displayValue;
+            }
+
+            function updateHistory() {
+                const historyList = document.getElementById('history-list');
+                historyList.innerHTML = '';
+                calculator.history.forEach(entry => {
+                    const li = document.createElement('li');
+                    li.textContent = entry;
+                    historyList.appendChild(li);
+                });
+            }
+
+            function handleNumber(number) {
+                const { displayValue, waitingForSecondOperand } = calculator;
+
+                if (waitingForSecondOperand) {
+                    calculator.displayValue = number;
+                    calculator.waitingForSecondOperand = false;
+                } else {
+                    calculator.displayValue = displayValue === '0' ? number : displayValue + number;
+                }
+
+                updateDisplay();
+            }
+
+            function handleOperator(nextOperator) {
+                const { firstOperand, displayValue, operator } = calculator;
+                const inputValue = parseFloat(displayValue);
+
+                if (operator && calculator.waitingForSecondOperand) {
+                    calculator.operator = nextOperator;
+                    return;
+                }
+
+                if (firstOperand == null && !isNaN(inputValue)) {
+                    calculator.firstOperand = inputValue;
+                } else if (operator) {
+                    const result = calculate(firstOperand, inputValue, operator);
+                    calculator.displayValue = `${parseFloat(result.toFixed(7))}`;
+                    calculator.history.push(`${firstOperand} ${operator} ${inputValue} = ${result}`);
+                    calculator.firstOperand = result;
+                }
+
+                calculator.waitingForSecondOperand = true;
+                calculator.operator = nextOperator;
+                updateDisplay();
+                updateHistory();
+            }
+
+            function calculate(firstOperand, secondOperand, operator) {
+                if (operator === '+') {
+                    return firstOperand + secondOperand;
+                } else if (operator === '-') {
+                    return firstOperand - secondOperand;
+                } else if (operator === '*') {
+                    return firstOperand * secondOperand;
+                } else if (operator === '/') {
+                    return firstOperand / secondOperand;
+                }
+
+                return secondOperand;
+            }
+
+            function handleDecimal(dot) {
+                if (calculator.waitingForSecondOperand) return;
+
+                if (!calculator.displayValue.includes(dot)) {
+                    calculator.displayValue += dot;
+                }
+
+                updateDisplay();
+            }
+
+            function resetCalculator() {
+                calculator.displayValue = '0';
+                calculator.firstOperand = null;
+                calculator.waitingForSecondOperand = false;
+                calculator.operator = null;
+                updateDisplay();
+            }
+
+            function clearHistory() {
+                calculator.history = [];
+                updateHistory();
+            }
+
+            const keys = document.querySelector('.calculator-keys');
+            keys.addEventListener('click', (event) => {
+                const { target } = event;
+                const { value } = target;
+
+                if (!target.matches('button')) {
+                    return;
+                }
+
+                switch (value) {
+                    case '+':
+                    case '-':
+                    case '*':
+                    case '/':
+                        handleOperator(value);
+                        break;
+                    case '=':
+                        handleOperator(calculator.operator);
+                        calculator.operator = null;
+                        calculator.waitingForSecondOperand = false;
+                        break;
+                    case '.':
+                        handleDecimal(value);
+                        break;
+                    case 'all-clear':
+                        resetCalculator();
+                        break;
+                    default:
+                        if (Number.isInteger(parseFloat(value))) {
+                            handleNumber(value);
+                        }
+                }
+
+                updateDisplay();
+                updateHistory();
+            });
+
+            const clearHistoryButton = document.querySelector('.clear-history');
+            clearHistoryButton.addEventListener('click', clearHistory);
+
+            updateDisplay();
+            updateHistory();
+        });
+    </script>
+</body>
+</html>
