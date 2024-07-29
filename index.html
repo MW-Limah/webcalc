@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calculadora</title>
     <style>
-        body {
+         body {
             display: flex;
             justify-content: center;
             align-items: center;
@@ -133,8 +133,8 @@
         <input type="text" class="calculator-screen" value="" disabled />
         <div class="calculator-keys">
             <button>%</button>
-            <button>('±')</button>
             <button type="button" class="all-clear" value="all-clear">AC</button>
+            <button type="button" class="delete" data-value=""><img src="/icons8-backspace-50.png" alt="Backspace"></button>
             <button type="button" class="operator" value="/">&divide;</button>
             <button type="button" value="7">7</button>
             <button type="button" value="8">8</button>
@@ -148,7 +148,7 @@
             <button type="button" value="2">2</button>
             <button type="button" value="3">3</button>
             <button type="button" class="operator" value="+">+</button>
-            <button type="button" value="0" style="grid-column: span 2;">0</button>
+            <button type="button" value="0">0</button>
             <button type="button" class="decimal" value=".">.</button>
             <button type="button" class="equal-sign operator" value="=">=</button>
         </div>
@@ -257,6 +257,15 @@
                 updateHistory();
             }
 
+            function handleDelete() {
+                if (calculator.displayValue.length > 1) {
+                    calculator.displayValue = calculator.displayValue.slice(0, -1);
+                } else {
+                    calculator.displayValue = '0';
+                }
+                updateDisplay();
+            }
+
             const keys = document.querySelector('.calculator-keys');
             keys.addEventListener('click', (event) => {
                 const { target } = event;
@@ -283,6 +292,9 @@
                         break;
                     case 'all-clear':
                         resetCalculator();
+                        break;
+                    case 'delete':
+                        handleDelete();
                         break;
                     default:
                         if (Number.isInteger(parseFloat(value))) {
