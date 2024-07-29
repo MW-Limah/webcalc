@@ -12,12 +12,7 @@
             height: 100vh;
             background-color: #f4f4f4;
             font-family: 'Arial', sans-serif;
-            margin: 0;
-        }
-
-        .container {
-            display: flex;
-            gap: 20px; /* Espaço entre as divs */
+            flex-direction: column;
         }
 
         .calculator {
@@ -25,8 +20,7 @@
             border-radius: 5px;
             box-shadow: 0px 0px 10px 0px #aaa;
             width: 400px;
-            background-color: #fff;
-            box-sizing: border-box;
+            margin-bottom: 20px;
         }
 
         .calculator-screen {
@@ -135,37 +129,36 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="calculator">
-            <input type="text" class="calculator-screen" value="" disabled />
-            <div class="calculator-keys">
-                <button>%</button>
-                <button type="button" class="all-clear" value="all-clear">AC</button>
-                <button type="button" class="delete" data-value=""><img src="https://github.com/MW-Limah/webcalc/raw/main/backspace.png" alt="Backspace"></button>
-                <button type="button" class="operator" value="/">&divide;</button>
-                <button type="button" value="7">7</button>
-                <button type="button" value="8">8</button>
-                <button type="button" value="9">9</button>
-                <button type="button" class="operator" value="*">&times;</button>
-                <button type="button" value="4">4</button>
-                <button type="button" value="5">5</button>
-                <button type="button" value="6">6</button>
-                <button type="button" class="operator" value="-">-</button>
-                <button type="button" value="1">1</button>
-                <button type="button" value="2">2</button>
-                <button type="button" value="3">3</button>
-                <button type="button" class="operator" value="+">+</button>
-                <button type="button" value="0">0</button>
-                <button type="button" class="decimal" value=".">.</button>
-                <button type="button" class="equal-sign operator" value="=">=</button>
-            </div>
-        </div>
-        <div class="history">
-            <h3>Histórico</h3>
-            <ul id="history-list"></ul>
-            <button class="clear-history">Limpar Histórico</button>
+    <div class="history">
+        <h3>Histórico</h3>
+        <ul id="history-list"></ul>
+        <button class="clear-history">Limpar Histórico</button>
+    </div>
+    <div class="calculator">
+        <input type="text" class="calculator-screen" value="" disabled />
+        <div class="calculator-keys">
+            <button>%</button>
+            <button type="button" class="all-clear" value="all-clear">AC</button>
+            <button type="button" class="delete" data-value=""><img src="https://github.com/MW-Limah/webcalc/raw/main/backspace.png" alt="Backspace"></button>
+            <button type="button" class="operator" value="/">&divide;</button>
+            <button type="button" value="7">7</button>
+            <button type="button" value="8">8</button>
+            <button type="button" value="9">9</button>
+            <button type="button" class="operator" value="*">&times;</button>
+            <button type="button" value="4">4</button>
+            <button type="button" value="5">5</button>
+            <button type="button" value="6">6</button>
+            <button type="button" class="operator" value="-">-</button>
+            <button type="button" value="1">1</button>
+            <button type="button" value="2">2</button>
+            <button type="button" value="3">3</button>
+            <button type="button" class="operator" value="+">+</button>
+            <button type="button" value="0">0</button>
+            <button type="button" class="decimal" value=".">.</button>
+            <button type="button" class="equal-sign operator" value="=">=</button>
         </div>
     </div>
+    
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const calculator = {
@@ -217,8 +210,8 @@
                     calculator.firstOperand = inputValue;
                 } else if (operator) {
                     const result = calculate(firstOperand, inputValue, operator);
-                    calculator.displayValue = `${parseFloat(result.toFixed(7))}`;
-                    calculator.history.push(`${firstOperand} ${operator} ${inputValue} = ${result}`);
+                    calculator.displayValue = `${parseFloat(result.toFixed(7))}`; // Corrigido aqui
+                    calculator.history.push(`${firstOperand} ${operator} ${inputValue} = ${result}`); // Corrigido aqui
                     calculator.firstOperand = result;
                 }
 
